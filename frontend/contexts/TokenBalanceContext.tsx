@@ -24,10 +24,24 @@ export function TokenBalanceProvider({ children }: { children: ReactNode }) {
     }
 
     setIsLoading(true);
-    // Mock token balance - will be replaced with actual contract call
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setBalance('0');
-    setIsLoading(false);
+    try {
+      // Mock token balance calculation based on streaks
+      // In production, this would call the token contract
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Mock: Calculate balance from localStorage or contract
+      const storedBalance = localStorage.getItem(`tokenBalance_${address}`);
+      if (storedBalance) {
+        setBalance(storedBalance);
+      } else {
+        setBalance('0');
+      }
+    } catch (error) {
+      console.error('Error fetching balance:', error);
+      setBalance('0');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
