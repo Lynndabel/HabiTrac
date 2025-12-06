@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import TokenBalance from './TokenBalance';
 
 export default function Navigation() {
   const pathname = usePathname();
@@ -68,9 +69,11 @@ export default function Navigation() {
               </svg>
               Profile
             </Link>
+            <TokenBalance />
             <ConnectButton />
           </div>
           <div className="md:hidden flex items-center space-x-2">
+            <TokenBalance />
             <ConnectButton />
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
