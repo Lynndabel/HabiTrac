@@ -73,6 +73,32 @@ describe("HabiTrac - Streak Calculation Tests", function () {
       const streak = await habiTrac.getHabitStreak(user1.address, habitId);
       expect(streak).to.equal(3);
     });
+
+    it("Should reset streak when there is a gap between logs", async function () {
+      const tx = await habiTrac.connect(user1).createHabit("Test Habit", "Test Description");
+      const receipt = await tx.wait();
+      const event = receipt.logs.find(log => {
+        try {
+          return habiTrac.interface.parseLog(log).name === "HabitCreated";
+        } catch {
+          return false;
+        }
+      });
+      const habitId = habiTrac.interface.parseLog(event).args.habitId;
+      
+      const baseTime = Math.floor(Date.now() / 1000);
+      const oneDay = 86400;
+      
+      // Log for 2 consecutive days
+      await habiTrac.connect(user1).logHabit(habitId, baseTime);
+      await habiTrac.connect(user1).logHabit(habitId, baseTime + oneDay);
+      
+      // Skip a day (gap), then log again
+      await habiTrac.connect(user1).logHabit(habitId, baseTime + (oneDay * 3));
+      
+      const streak = await habiTrac.getHabitStreak(user1.address, habitId);
+      expect(streak).to.equal(1); // Should reset to 1 after gap
+    });
   });
 });
 
