@@ -121,6 +121,18 @@ contract HabiTrac is Ownable {
         emit HabitLogged(msg.sender, _habitId, _timestamp);
     }
 
+    function _calculateReward(address _user, uint256 _habitId) internal view returns (uint256) {
+        uint256 streak = habitStreaks[_user][_habitId];
+        uint256 reward = BASE_REWARD; // Base reward for logging
+        
+        // Bonus for maintaining streaks (extra token every 7 days)
+        if (streak > 0 && streak % STREAK_BONUS_DIVISOR == 0) {
+            reward += BASE_REWARD; // Double reward on streak milestones
+        }
+        
+        return reward;
+    }
+
     function _updateStreak(address _user, uint256 _habitId, uint256 _timestamp) internal {
         HabitLog[] storage logs = habitLogs[_user][_habitId];
         if (logs.length == 0) {
