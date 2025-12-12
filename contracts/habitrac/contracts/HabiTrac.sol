@@ -118,7 +118,20 @@ contract HabiTrac is Ownable {
         // Update streak
         _updateStreak(msg.sender, _habitId, _timestamp);
 
+        // Award tokens based on streak
+        uint256 rewardAmount = _calculateReward(msg.sender, _habitId);
+        _distributeReward(msg.sender, rewardAmount);
+
         emit HabitLogged(msg.sender, _habitId, _timestamp);
+        emit RewardClaimed(msg.sender, _habitId, rewardAmount);
+    }
+    
+    function _distributeReward(address _user, uint256 _amount) internal {
+        if (_amount > 0 && address(rewardToken) != address(0)) {
+            // Try to transfer tokens from contract balance
+            // Contract owner should fund the contract with tokens
+            SafeERC20.safeTransfer(rewardToken, _user, _amount);
+        }
     }
 
     function _calculateReward(address _user, uint256 _habitId) internal view returns (uint256) {
